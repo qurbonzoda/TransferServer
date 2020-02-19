@@ -1,0 +1,25 @@
+GET http://127.0.0.1:8080/currencies
+
+###
+
+GET http://127.0.0.1:8080/currency/101
+
+###
+
+POST http://127.0.0.1:8080/currency
+Content-Type: application/json
+
+{"name": "ruble", "exchangeRate": "1.65"}
+
+###
+
+PUT http://127.0.0.1:8080/currency
+Content-Type: application/json
+
+{"id": "101", "exchangeRate": "1.75"}
+
+###
+
+DELETE http://127.0.0.1:8080/currency/101
+
+###
