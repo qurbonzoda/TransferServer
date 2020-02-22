@@ -1,0 +1,26 @@
+GET http://127.0.0.1:8080/user/101
+
+###
+
+PUT http://127.0.0.1:8080/user
+Content-Type: application/json
+
+{
+  "id": "101",
+  "newFullName": "Abduqodiri Qurbonzoda"
+}
+
+###
+
+POST http://127.0.0.1:8080/user/account
+Content-Type: application/json
+
+{
+  "currencyId":  "4"
+}
+
+###
+
+DELETE http://127.0.0.1:8080/user/account/101
+
+###
