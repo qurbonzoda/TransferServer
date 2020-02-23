@@ -1,4 +1,4 @@
-GET http://127.0.0.1:8080/account/101
+GET http://127.0.0.1:8080/account/0
 
 ###
 
@@ -6,9 +6,9 @@ PUT http://127.0.0.1:8080/account
 Content-Type: application/json
 
 {
-  "id": "101",
+  "id": "0",
   "diff": "-1.75",
-  "currencyId": "1001"
+  "currencyName": "RUB"
 }
 
 ###
