@@ -1,5 +1,6 @@
 import controllers.apiAccount
 import controllers.apiCurrency
+import controllers.apiTransfer
 import controllers.apiUser
 import io.ktor.application.call
 import io.ktor.application.install
@@ -14,6 +15,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import services.AccountService
 import services.CurrencyService
+import services.TransferService
 import services.UserService
 import java.text.DateFormat
 
@@ -43,36 +45,13 @@ fun main(args: Array<String>) {
         val currencyService = CurrencyService()
         val accountService = AccountService(currencyService)
         val userService = UserService(accountService)
+        val transferService = TransferService(accountService, currencyService)
 
         routing {
             apiCurrency(currencyService)
             apiAccount(accountService)
             apiUser(userService)
-
-            get("/transfers/account/{id}") {
-                val id = call.parameters["id"]
-                val offset = call.request.queryParameters["offset"]
-                val limit = call.request.queryParameters["limit"]
-                call.respond("Get all transfer operations performed by the account with id = $id, offset: $offset, limit: $limit")
-            }
-
-            route("/transfer") {
-                get("{id}") {
-                    call.respond("Get transfer with id = ${call.parameters["id"]}")
-                }
-
-                post {
-                    val transfer = call.receive<TransferDTO>()
-                    call.respond("Post transfer with parameters: $transfer")
-                }
-            }
+            apiTransfer(transferService)
         }
     }.start()
 }
-
-data class TransferDTO(
-    val fromAccountId: IDType,
-    val toAccountId: IDType,
-    val balance: MoneyType,
-    val currencyId: IDType
-)

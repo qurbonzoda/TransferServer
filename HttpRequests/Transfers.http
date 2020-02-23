@@ -1,8 +1,8 @@
-GET http://127.0.0.1:8080/transfers/account/101?offset=0&limit=10
+GET http://127.0.0.1:8080/transfers/account/1?offset=1&limit=1
 
 ###
 
-GET http://127.0.0.1:8080/transfer/101
+GET http://127.0.0.1:8080/transfer/0
 
 ###
 
@@ -12,8 +12,8 @@ Content-Type: application/json
 {
   "fromAccountId": "1",
   "toAccountId": "2",
-  "balance":  "3",
-  "currencyId":  "4"
+  "amount":  "7",
+  "currencyName":  "RUB"
 }
 
 ###

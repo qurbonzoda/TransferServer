@@ -5,34 +5,59 @@ import Currency
 import ExchangeRateType
 import IdNotFoundException
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.locks.ReentrantLock
 
 final class CurrencyService {
-    private val currencies = ConcurrentHashMap<String, Currency>()
+    private val currencies = HashMap<String, Currency>()
+    private val lock = ReentrantLock()
 
     fun getCurrencies(): List<Currency> {
-        return currencies.values.toList()
+        acquireLock()
+        val result = currencies.values.toList()
+        releaseLock()
+
+        return result
     }
 
     fun getCurrency(name: String): Currency {
-        return currencies[name]
-            ?: throw IdNotFoundException("Currency with the given name: \"$name\" doesn't exist")
+        acquireLock()
+        val result = currencies[name]
+        releaseLock()
+
+        return result ?: throw IdNotFoundException("Currency with the given name: \"$name\" doesn't exist")
     }
 
     fun createCurrency(name: String, exchangeRate: ExchangeRateType) {
         val currency = Currency(name, exchangeRate)
+
+        acquireLock()
         val oldValue = currencies.putIfAbsent(name, currency)
-        if (oldValue != null) {
-            throw CreateNotAllowedException("Currency with the given name: \"$name\" already exists")
-        }
+        releaseLock()
+
+        if (oldValue != null) throw CreateNotAllowedException("Currency with the given name: \"$name\" already exists")
     }
 
     fun changeCurrency(name: String, exchangeRate: ExchangeRateType) {
-        currencies.computeIfPresent(name) { _, _ -> Currency(name, exchangeRate) }
-            ?: throw IdNotFoundException("Currency with the given name: \"$name\" doesn't exist")
+        acquireLock()
+        val oldValue = currencies.computeIfPresent(name) { _, _ -> Currency(name, exchangeRate) }
+        releaseLock()
+
+        if (oldValue == null) throw IdNotFoundException("Currency with the given name: \"$name\" doesn't exist")
     }
 
     fun deleteCurrency(name: String) {
-        currencies.remove(name)
-            ?: throw IdNotFoundException("Currency with the given name: \"$name\" doesn't exist")
+        acquireLock()
+        val oldValue = currencies.remove(name)
+        releaseLock()
+
+        if (oldValue == null) throw IdNotFoundException("Currency with the given name: \"$name\" doesn't exist")
+    }
+
+    fun acquireLock() {
+        lock.lock()
+    }
+
+    fun releaseLock() {
+        lock.unlock()
     }
 }

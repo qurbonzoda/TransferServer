@@ -42,4 +42,8 @@ final class AccountService(private val currencyService: CurrencyService) {
         accounts.computeIfPresent(id) { _, old -> old.diff(diff) }
             ?: throw IdNotFoundException("Account with the given id: \"$id\" doesn't exist")
     }
+
+    fun acquireLock(id: IDType, remappingFunction: (IDType, Account) -> Account): Account? {
+        return accounts.computeIfPresent(id, remappingFunction)
+    }
 }
