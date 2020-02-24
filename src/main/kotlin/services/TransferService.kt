@@ -57,6 +57,21 @@ final class TransferService(private val accountService: AccountService, private 
             if (newFromAccount == null) {
                 nonExistentAccountId = fromAccountId
             }
+        } else {
+            val newToAccount = accountService.acquireLock(toAccountId) { _, toAccount ->
+                val newFromAccount = accountService.acquireLock(fromAccountId) { _, fromAccount -> fromAccount.diff(-amount) }
+
+                if (newFromAccount == null) {
+                    nonExistentAccountId = fromAccountId
+                    toAccount
+                } else {
+                    toAccount.diff(amount)
+                }
+            }
+
+            if (newToAccount == null) {
+                nonExistentAccountId = toAccountId
+            }
         }
 
         currencyService.releaseLock()
