@@ -24,15 +24,15 @@ fun Routing.apiAccount(service: AccountService) {
 
         // e.g. from ATM
         put("deposit") {
-            val deposit = call.receive<Deposit>()
-            if (deposit.amount < 0) throw BadRequest("Deposit amount: ${deposit.amount} should be greater than zero")
+            val deposit = call.receive<DepositRequest>()
+            if (deposit.amount < 0) throw BadRequest("Deposit amount: ${deposit.amount} is negative")
             service.depositIntoAccount(deposit.id, deposit.amount, deposit.currencyName)
             call.respond(HttpStatusCode.OK)
         }
 
         put("withdraw") {
-            val withdraw = call.receive<Withdraw>()
-            if (withdraw.amount < 0) throw BadRequest("Withdraw amount: ${withdraw.amount} should be greater than zero")
+            val withdraw = call.receive<WithdrawRequest>()
+            if (withdraw.amount < 0) throw BadRequest("Withdraw amount: ${withdraw.amount} is negative")
             service.withdrawFromAccount(withdraw.id, withdraw.amount, withdraw.currencyName)
             call.respond(HttpStatusCode.OK)
         }
@@ -40,14 +40,14 @@ fun Routing.apiAccount(service: AccountService) {
 }
 
 @Serializable
-data class Deposit(
+data class DepositRequest(
     val id: IDType,
     val amount: MoneyType,
     val currencyName: String
 )
 
 @Serializable
-data class Withdraw(
+data class WithdrawRequest(
     val id: IDType,
     val amount: MoneyType,
     val currencyName: String

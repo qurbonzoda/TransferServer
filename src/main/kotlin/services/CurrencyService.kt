@@ -36,9 +36,9 @@ final class CurrencyService {
         if (oldValue != null) throw CreateNotAllowedException("Currency with the given name: \"$name\" already exists")
     }
 
-    fun changeCurrency(name: String, exchangeRate: ExchangeRateType) {
+    fun updateCurrency(name: String, exchangeRate: ExchangeRateType) {
         acquireLock()
-        val oldValue = currencies.computeIfPresent(name) { _, old -> old.changeExchangeRate(exchangeRate) }
+        val oldValue = currencies.computeIfPresent(name) { _, old -> old.updateExchangeRate(exchangeRate) }
         releaseLock()
 
         if (oldValue == null) throw IdNotFoundException("Currency with the given name: \"$name\" doesn't exist")

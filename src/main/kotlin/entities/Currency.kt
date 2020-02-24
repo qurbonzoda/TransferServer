@@ -9,7 +9,7 @@ data class Currency(
     val name: String,
     val exchangeRate: ExchangeRateType
 ) {
-    fun changeExchangeRate(newExchangeRate: ExchangeRateType) =
+    fun updateExchangeRate(newExchangeRate: ExchangeRateType) =
         Currency(name, newExchangeRate)
 
     fun convert(amount: MoneyType, toCurrency: Currency): MoneyType {

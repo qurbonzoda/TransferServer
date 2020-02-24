@@ -34,15 +34,15 @@ final class AccountService(private val currencyService: CurrencyService) {
 
     fun depositIntoAccount(id: IDType, amount: MoneyType, currencyName: String) {
         require(amount > 0)
-        changeAccountBalance(id, amount, currencyName)
+        updateAccountBalance(id, amount, currencyName)
     }
 
     fun withdrawFromAccount(id: IDType, amount: MoneyType, currencyName: String) {
         require(amount > 0)
-        changeAccountBalance(id, -amount, currencyName)
+        updateAccountBalance(id, -amount, currencyName)
     }
 
-    private fun changeAccountBalance(id: IDType, diff: MoneyType, currencyName: String) {
+    private fun updateAccountBalance(id: IDType, diff: MoneyType, currencyName: String) {
 //        val currency = currencyService.getCurrency(currencyName)
 
         // TODO: convert the given amount to the right currency.

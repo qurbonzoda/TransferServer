@@ -31,16 +31,16 @@ fun Routing.apiTransfer(service: TransferService) {
         }
 
         post {
-            val dto = call.receive<TransferDTO>()
-            if (dto.amount < 0) throw BadRequest("Transfer amount: ${dto.amount} should be greater than zero")
-            val transfer = service.createTransfer(dto.fromAccountId, dto.toAccountId, dto.amount, dto.currencyName)
+            val create = call.receive<CreateTransferRequest>()
+            if (create.amount < 0) throw BadRequest("Transfer amount: ${create.amount} is negative")
+            val transfer = service.createTransfer(create.fromAccountId, create.toAccountId, create.amount, create.currencyName)
             call.respond(transfer)
         }
     }
 }
 
 @Serializable
-data class TransferDTO(
+data class CreateTransferRequest(
     val fromAccountId: IDType,
     val toAccountId: IDType,
     val amount: MoneyType,

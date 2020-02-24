@@ -57,10 +57,10 @@ class UserServiceTest {
     }
 
     @Test
-    fun changeUser() {
+    fun updateUser() {
         val userService = createUserService()
 
-        assertFailsWith<BadRequest> { userService.changeUser(0, "Abduqodiri Qurbonzoda") }
+        assertFailsWith<BadRequest> { userService.updateUser(0, "Abduqodiri Qurbonzoda") }
 
         val ids = mutableSetOf<IDType>()
 
@@ -74,7 +74,7 @@ class UserServiceTest {
 
         repeat(100) { index ->
             val userId = ids.elementAt(index)
-            userService.changeUser(userId, "Nikita Nozhkin-$index")
+            userService.updateUser(userId, "Nikita Nozhkin-$index")
             assertEquals("Nikita Nozhkin-$index", userService.getUser(userId).fullName)
         }
     }
@@ -102,7 +102,7 @@ class UserServiceTest {
             userService.deleteUser(userId)
             
             assertFailsWith<BadRequest> { userService.getUser(userId) }
-            assertFailsWith<BadRequest> { userService.changeUser(userId, "Nikita Nozhkin-$index") }
+            assertFailsWith<BadRequest> { userService.updateUser(userId, "Nikita Nozhkin-$index") }
             assertFailsWith<BadRequest> { userService.deleteUser(userId) }
         }
     }

@@ -11,7 +11,7 @@ import services.UserService
 fun Routing.apiUser(service: UserService) {
     route("/user") {
         post {
-            val create = call.receive<CreateUser>()
+            val create = call.receive<CreateUserRequest>()
             val user = service.createUser(create.fullName)
             call.respond(user.id)
         }
@@ -25,8 +25,8 @@ fun Routing.apiUser(service: UserService) {
 
             put {
                 val userId = call.validateId("userId")
-                val change = call.receive<FullNameChange>()
-                service.changeUser(userId, change.newFullName)
+                val update = call.receive<UpdateUserRequest>()
+                service.updateUser(userId, update.newFullName)
                 call.respond(HttpStatusCode.OK)
             }
 
@@ -39,7 +39,7 @@ fun Routing.apiUser(service: UserService) {
             route("account") {
                 post {
                     val userId = call.validateId("userId")
-                    val create = call.receive<CreateAccount>()
+                    val create = call.receive<CreateAccountRequest>()
                     val account = service.createAccount(userId, create.currencyName)
                     call.respond(account.id)
                 }
@@ -56,12 +56,12 @@ fun Routing.apiUser(service: UserService) {
 }
 
 @Serializable
-data class FullNameChange(
+data class UpdateUserRequest(
     val newFullName: String
 )
 
 @Serializable
-data class CreateAccount(val currencyName: String)
+data class CreateAccountRequest(val currencyName: String)
 
 @Serializable
-data class CreateUser(val fullName: String)
+data class CreateUserRequest(val fullName: String)

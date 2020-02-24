@@ -23,14 +23,14 @@ fun Routing.apiCurrency(service: CurrencyService) {
         }
 
         post {
-            val currency = call.receive<CurrencyDTO>()
+            val currency = call.receive<CurrencyRequest>()
             service.createCurrency(currency.name, currency.exchangeRate)
             call.respond(HttpStatusCode.OK)
         }
 
         put {
-            val currency = call.receive<CurrencyDTO>()
-            service.changeCurrency(currency.name, currency.exchangeRate)
+            val currency = call.receive<CurrencyRequest>()
+            service.updateCurrency(currency.name, currency.exchangeRate)
             call.respond(HttpStatusCode.OK)
         }
 
@@ -43,7 +43,7 @@ fun Routing.apiCurrency(service: CurrencyService) {
 }
 
 @Serializable
-data class CurrencyDTO(
+data class CurrencyRequest(
     val name: String,
     val exchangeRate: ExchangeRateType
 )

@@ -24,9 +24,9 @@ class CurrencyServiceTest {
 
         expected.random()
             .also { expected.remove(it) }
-            .let { it.changeExchangeRate(it.exchangeRate + 1.0) }
+            .let { it.updateExchangeRate(it.exchangeRate + 1.0) }
             .also { expected.add(it) }
-            .also { service.changeCurrency(it.name, it.exchangeRate) }
+            .also { service.updateCurrency(it.name, it.exchangeRate) }
 
         assertEquals(expected, service.getCurrencies())
 
@@ -81,10 +81,10 @@ class CurrencyServiceTest {
     }
 
     @Test
-    fun changeCurrency() {
+    fun updateCurrency() {
         val service = CurrencyService()
 
-        assertFailsWith<BadRequest> { service.changeCurrency("RUB", 65.0) }
+        assertFailsWith<BadRequest> { service.updateCurrency("RUB", 65.0) }
 
         val expected = mutableSetOf<Currency>()
 
@@ -100,12 +100,12 @@ class CurrencyServiceTest {
 
             expected.removeIf { currency -> currency.name == name }
             expected.add(Currency(name, newExchangeRate))
-            service.changeCurrency(name, newExchangeRate)
+            service.updateCurrency(name, newExchangeRate)
         }
 
         assertEquals(expected, service.getCurrencies())
 
-        assertFailsWith<BadRequest> { service.changeCurrency("100", 65.0) }
+        assertFailsWith<BadRequest> { service.updateCurrency("100", 65.0) }
     }
 
     @Test

@@ -17,7 +17,7 @@ final class User(
         return User(id, fullName, accountIds - accountId)
     }
 
-    fun changeFullName(newFullName: String): User {
+    fun updateFullName(newFullName: String): User {
         return User(id, newFullName, accountIds)
     }
 }

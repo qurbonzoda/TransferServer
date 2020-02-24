@@ -24,8 +24,8 @@ final class UserService(private val accountService: AccountService) {
         }
     }
 
-    fun changeUser(id: IDType, newFullName: String) {
-        users.computeIfPresent(id) { _, oldUser -> oldUser.changeFullName(newFullName) }
+    fun updateUser(id: IDType, newFullName: String) {
+        users.computeIfPresent(id) { _, oldUser -> oldUser.updateFullName(newFullName) }
             ?: throw IdNotFoundException("User with the given id: \"$id\" doesn't exist")
     }
 
