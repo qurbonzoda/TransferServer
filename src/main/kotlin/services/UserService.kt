@@ -19,7 +19,7 @@ final class UserService(private val accountService: AccountService) {
     fun createUser(fullName: String): User {
         while (true) {
             val id = idGenerator.next()
-            val user = User(id, fullName, emptyList())
+            val user = User(id, fullName, emptySet())
             users.putIfAbsent(id, user) ?: return user
         }
     }
@@ -32,7 +32,7 @@ final class UserService(private val accountService: AccountService) {
     fun deleteUser(id: IDType) {
         while (true) {
             val user = getUser(id)
-            val accountCount = user.accounts.size
+            val accountCount = user.accountIds.size
             if (accountCount != 0)
                 throw DeleteNotAllowedException("The given user has $accountCount account(s). Firstly remove the user's all accounts")
 
@@ -52,7 +52,7 @@ final class UserService(private val accountService: AccountService) {
     fun deleteAccount(userId: IDType, accountId: IDType) {
         while (true) {
             val oldUser = getUser(userId)
-            if (!oldUser.accounts.contains(accountId))
+            if (!oldUser.accountIds.contains(accountId))
                 throw IdNotFoundException("User with given id: $userId doesn't have an account with id: $accountId")
 
             val newUser = oldUser.removeAccount(accountId)
