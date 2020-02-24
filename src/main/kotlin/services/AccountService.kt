@@ -32,8 +32,18 @@ final class AccountService(private val currencyService: CurrencyService) {
         } while (!accounts.remove(id, account))
     }
 
-    fun changeAccount(id: IDType, diff: MoneyType, currencyName: String) {
-        val currency = currencyService.getCurrency(currencyName)
+    fun depositIntoAccount(id: IDType, amount: MoneyType, currencyName: String) {
+        require(amount > 0)
+        changeAccountBalance(id, amount, currencyName)
+    }
+
+    fun withdrawFromAccount(id: IDType, amount: MoneyType, currencyName: String) {
+        require(amount > 0)
+        changeAccountBalance(id, -amount, currencyName)
+    }
+
+    private fun changeAccountBalance(id: IDType, diff: MoneyType, currencyName: String) {
+//        val currency = currencyService.getCurrency(currencyName)
 
         // TODO: convert the given amount to the right currency.
         accounts.computeIfPresent(id) { _, old -> old.diff(diff) }

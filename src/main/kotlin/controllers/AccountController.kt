@@ -1,5 +1,6 @@
 package controllers
 
+import BadRequest
 import IDType
 import MoneyType
 import io.ktor.application.call
@@ -22,17 +23,32 @@ fun Routing.apiAccount(service: AccountService) {
         }
 
         // e.g. from ATM
-        put {
-            val diff = call.receive<BalanceDiff>()
-            service.changeAccount(diff.id, diff.diff, diff.currencyName)
+        put("deposit") {
+            val deposit = call.receive<Deposit>()
+            if (deposit.amount < 0) throw BadRequest("Deposit amount: ${deposit.amount} should be greater than zero")
+            service.depositIntoAccount(deposit.id, deposit.amount, deposit.currencyName)
+            call.respond(HttpStatusCode.OK)
+        }
+
+        put("withdraw") {
+            val withdraw = call.receive<Withdraw>()
+            if (withdraw.amount < 0) throw BadRequest("Withdraw amount: ${withdraw.amount} should be greater than zero")
+            service.withdrawFromAccount(withdraw.id, withdraw.amount, withdraw.currencyName)
             call.respond(HttpStatusCode.OK)
         }
     }
 }
 
 @Serializable
-data class BalanceDiff(
+data class Deposit(
     val id: IDType,
-    val diff: MoneyType,
+    val amount: MoneyType,
+    val currencyName: String
+)
+
+@Serializable
+data class Withdraw(
+    val id: IDType,
+    val amount: MoneyType,
     val currencyName: String
 )

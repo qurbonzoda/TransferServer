@@ -2,12 +2,23 @@ GET http://127.0.0.1:8080/account/0
 
 ###
 
-PUT http://127.0.0.1:8080/account
+PUT http://127.0.0.1:8080/account/deposit
 Content-Type: application/json
 
 {
   "id": "0",
-  "diff": "-1.75",
+  "amount": "1.75",
+  "currencyName": "RUB"
+}
+
+###
+
+PUT http://127.0.0.1:8080/account/withdraw
+Content-Type: application/json
+
+{
+  "id": "0",
+  "amount": "5.75",
   "currencyName": "RUB"
 }
 
