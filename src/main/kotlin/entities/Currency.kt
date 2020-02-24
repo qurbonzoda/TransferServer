@@ -11,4 +11,8 @@ data class Currency(
 ) {
     fun changeExchangeRate(newExchangeRate: ExchangeRateType) =
         Currency(name, newExchangeRate)
+
+    fun convert(amount: MoneyType, toCurrency: Currency): MoneyType {
+        return amount * toCurrency.exchangeRate / exchangeRate
+    }
 }
