@@ -1,12 +1,10 @@
 package services
 
-import Account
-import Currency
+import entities.Account
 import DeleteNotAllowedException
 import IDType
 import IdNotFoundException
 import MoneyType
-import java.lang.IllegalStateException
 import java.util.concurrent.ConcurrentHashMap
 
 final class AccountService(private val currencyService: CurrencyService) {

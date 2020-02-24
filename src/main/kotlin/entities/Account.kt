@@ -1,3 +1,8 @@
+package entities
+
+import IDType
+import MoneyType
+
 class Account(
     val id: IDType,
     val balance: MoneyType,

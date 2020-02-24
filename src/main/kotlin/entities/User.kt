@@ -1,3 +1,7 @@
+package entities
+
+import IDType
+
 final class User(
     val id: IDType,
     val fullName: String,

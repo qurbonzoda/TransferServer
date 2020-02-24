@@ -8,7 +8,6 @@ import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
 import io.ktor.gson.gson
 import io.ktor.http.HttpStatusCode
-import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
 import io.ktor.server.engine.embeddedServer
@@ -29,15 +28,6 @@ fun main(args: Array<String>) {
         }
         install(StatusPages) {
             exception<BadRequest> {
-                call.respond(HttpStatusCode.BadRequest, it.message.toString())
-            }
-            exception<IdNotFoundException> {
-                call.respond(HttpStatusCode.BadRequest, it.message.toString())
-            }
-            exception<DeleteNotAllowedException> {
-                call.respond(HttpStatusCode.BadRequest, it.message.toString())
-            }
-            exception<CreateNotAllowedException> {
                 call.respond(HttpStatusCode.BadRequest, it.message.toString())
             }
         }

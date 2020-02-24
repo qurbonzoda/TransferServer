@@ -1,10 +1,10 @@
 package services
 
-import Account
+import entities.Account
 import DeleteNotAllowedException
 import IDType
 import IdNotFoundException
-import User
+import entities.User
 import java.util.concurrent.ConcurrentHashMap
 
 final class UserService(private val accountService: AccountService) {

@@ -1,19 +1,18 @@
 package services
 
 import CreateNotAllowedException
-import Currency
+import entities.Currency
 import ExchangeRateType
 import IdNotFoundException
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 
 final class CurrencyService {
     private val currencies = HashMap<String, Currency>()
     private val lock = ReentrantLock()
 
-    fun getCurrencies(): List<Currency> {
+    fun getCurrencies(): Set<Currency> {
         acquireLock()
-        val result = currencies.values.toList()
+        val result = currencies.values.toSet()
         releaseLock()
 
         return result
@@ -39,7 +38,7 @@ final class CurrencyService {
 
     fun changeCurrency(name: String, exchangeRate: ExchangeRateType) {
         acquireLock()
-        val oldValue = currencies.computeIfPresent(name) { _, _ -> Currency(name, exchangeRate) }
+        val oldValue = currencies.computeIfPresent(name) { _, old -> old.changeExchangeRate(exchangeRate) }
         releaseLock()
 
         if (oldValue == null) throw IdNotFoundException("Currency with the given name: \"$name\" doesn't exist")

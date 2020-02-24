@@ -4,7 +4,8 @@ import CreateNotAllowedException
 import IDType
 import IdNotFoundException
 import MoneyType
-import Transfer
+import entities.Transfer
+import entities.TransferStatus
 import java.util.concurrent.ConcurrentHashMap
 
 final class TransferService(private val accountService: AccountService, private val currencyService: CurrencyService) {
@@ -24,7 +25,15 @@ final class TransferService(private val accountService: AccountService, private 
         do {
             val id = idGenerator.next()
             val timestamp = System.currentTimeMillis()
-            transfer = Transfer(id, fromAccountId, toAccountId, amount, currencyName, timestamp, TransferStatus.PROCESSING)
+            transfer = Transfer(
+                id,
+                fromAccountId,
+                toAccountId,
+                amount,
+                currencyName,
+                timestamp,
+                TransferStatus.PROCESSING
+            )
         } while (transfers.putIfAbsent(id, transfer!!) != null)
 
 
@@ -52,6 +61,7 @@ final class TransferService(private val accountService: AccountService, private 
 
         currencyService.releaseLock()
 
+        // TODO: Maybe throw exception if any of the given accounts does not exist
         val processedTransfer = transfer.updateStatus(
             if (nonExistentAccountId != null) TransferStatus.FAILED else TransferStatus.SUCCEEDED
         )

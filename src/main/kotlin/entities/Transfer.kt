@@ -1,4 +1,7 @@
-import java.util.*
+package entities
+
+import IDType
+import MoneyType
 
 final class Transfer(
     val id: IDType,
@@ -10,8 +13,15 @@ final class Transfer(
     val status: TransferStatus
 ) {
     fun updateStatus(updatedStatus: TransferStatus): Transfer {
-        System.currentTimeMillis()
-        return Transfer(id, fromAccountId, toAccountId, amount, currencyName, timestamp, updatedStatus)
+        return Transfer(
+            id,
+            fromAccountId,
+            toAccountId,
+            amount,
+            currencyName,
+            timestamp,
+            updatedStatus
+        )
     }
 }
 
