@@ -1,8 +1,11 @@
 package entities
 
 import ExchangeRateType
+import MoneyType
+import kotlinx.serialization.Serializable
 
-final data class Currency(
+@Serializable
+data class Currency(
     val name: String,
     val exchangeRate: ExchangeRateType
 ) {

@@ -2,7 +2,9 @@ package entities
 
 import IDType
 import MoneyType
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Account(
     val id: IDType,
     val balance: MoneyType,

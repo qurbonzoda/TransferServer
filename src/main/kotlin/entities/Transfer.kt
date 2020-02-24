@@ -2,7 +2,9 @@ package entities
 
 import IDType
 import MoneyType
+import kotlinx.serialization.Serializable
 
+@Serializable
 final class Transfer(
     val id: IDType,
     val fromAccountId: IDType,

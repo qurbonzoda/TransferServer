@@ -10,6 +10,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.put
 import io.ktor.routing.route
+import kotlinx.serialization.Serializable
 import services.AccountService
 
 fun Routing.apiAccount(service: AccountService) {
@@ -29,6 +30,7 @@ fun Routing.apiAccount(service: AccountService) {
     }
 }
 
+@Serializable
 data class BalanceDiff(
     val id: IDType,
     val diff: MoneyType,

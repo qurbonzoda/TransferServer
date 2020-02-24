@@ -1,7 +1,9 @@
 package entities
 
 import IDType
+import kotlinx.serialization.Serializable
 
+@Serializable
 final class User(
     val id: IDType,
     val fullName: String,

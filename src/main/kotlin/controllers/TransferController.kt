@@ -10,6 +10,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import kotlinx.serialization.Serializable
 import services.TransferService
 
 fun Routing.apiTransfer(service: TransferService) {
@@ -41,6 +42,7 @@ fun Routing.apiTransfer(service: TransferService) {
     }
 }
 
+@Serializable
 data class TransferDTO(
     val fromAccountId: IDType,
     val toAccountId: IDType,

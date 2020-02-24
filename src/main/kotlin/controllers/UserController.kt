@@ -5,6 +5,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
+import kotlinx.serialization.Serializable
 import services.UserService
 
 fun Routing.apiUser(service: UserService) {
@@ -54,11 +55,13 @@ fun Routing.apiUser(service: UserService) {
     }
 }
 
-
+@Serializable
 data class FullNameChange(
     val newFullName: String
 )
 
+@Serializable
 data class CreateAccount(val currencyName: String)
 
+@Serializable
 data class CreateUser(val fullName: String)

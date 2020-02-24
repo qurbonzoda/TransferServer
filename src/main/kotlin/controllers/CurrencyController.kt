@@ -6,6 +6,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
+import kotlinx.serialization.Serializable
 import services.CurrencyService
 
 fun Routing.apiCurrency(service: CurrencyService) {
@@ -41,6 +42,7 @@ fun Routing.apiCurrency(service: CurrencyService) {
     }
 }
 
+@Serializable
 data class CurrencyDTO(
     val name: String,
     val exchangeRate: ExchangeRateType
