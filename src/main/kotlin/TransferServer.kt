@@ -4,6 +4,7 @@ import controllers.apiTransfer
 import controllers.apiUser
 import io.ktor.application.call
 import io.ktor.application.install
+import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
@@ -19,6 +20,7 @@ import services.UserService
 
 fun main(args: Array<String>) {
     embeddedServer(Netty, port = 8080) {
+        install(CallLogging)
         install(ContentNegotiation) {
             serialization()
         }
