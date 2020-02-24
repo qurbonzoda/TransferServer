@@ -33,5 +33,15 @@ compileTestKotlin {
 }
 
 application {
-    mainClassName = 'TransferServerKt'
+    mainClassName = 'MainKt'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'MainKt'
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
