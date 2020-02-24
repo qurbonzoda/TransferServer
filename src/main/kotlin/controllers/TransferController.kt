@@ -16,12 +16,8 @@ import services.TransferService
 fun Routing.apiTransfer(service: TransferService) {
     get("/transfers/account/{accountId}") {
         val accountId = call.validateId("accountId")
-        val offset = call.request.queryParameters["offset"]?.let {
-            it.toIntOrNull() ?: throw BadRequest("Invalid offset: $it")
-        } ?: 0
-        val limit = call.request.queryParameters["limit"]?.let {
-            it.toIntOrNull() ?: throw BadRequest("Invalid offset: $it")
-        } ?: Int.MAX_VALUE
+        val offset = call.validateQueryParameter("offset", 0)
+        val limit = call.validateQueryParameter("limit", Int.MAX_VALUE)
 
         val transfers = service.getTransfers(accountId, offset, limit)
         call.respond(transfers)
@@ -36,6 +32,7 @@ fun Routing.apiTransfer(service: TransferService) {
 
         post {
             val dto = call.receive<TransferDTO>()
+            if (dto.amount < 0) throw BadRequest("Transfer amount: ${dto.amount} should be greater than zero")
             val transfer = service.createTransfer(dto.fromAccountId, dto.toAccountId, dto.amount, dto.currencyName)
             call.respond(transfer)
         }

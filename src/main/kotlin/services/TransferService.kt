@@ -85,11 +85,11 @@ final class TransferService(private val accountService: AccountService, private 
         return processedTransfer
     }
 
-    fun getTransfers(accountId: IDType, offset: Int, limit: Int): List<Transfer> {
+    fun getTransfers(accountId: IDType, offset: Int, limit: Int): Set<Transfer> {
         return transfers.values.asSequence()
             .filter { it.fromAccountId == accountId || it.toAccountId == accountId }
             .drop(offset)
             .take(limit)
-            .toList()
+            .toSet()
     }
 }
