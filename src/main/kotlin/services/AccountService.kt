@@ -17,10 +17,9 @@ final class AccountService(private val currencyService: CurrencyService) {
     }
 
     fun createAccount(currencyName: String): Account {
-        val currency = currencyService.getCurrency(currencyName)
         while (true) {
             val id = idGenerator.next()
-            val account = Account(id, 0.0, currency)
+            val account = Account(id, 0.0, currencyName)
             accounts.putIfAbsent(id, account) ?: return account
         }
     }
