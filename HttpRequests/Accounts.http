@@ -1,7 +1,9 @@
+# get an account by id
 GET http://127.0.0.1:8080/account/0
 
 ###
 
+# deposit specified amount into the account
 PUT http://127.0.0.1:8080/account/deposit
 Content-Type: application/json
 
@@ -13,6 +15,7 @@ Content-Type: application/json
 
 ###
 
+# withdraw specified amount from the account
 PUT http://127.0.0.1:8080/account/withdraw
 Content-Type: application/json
 

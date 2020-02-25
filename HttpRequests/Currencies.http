@@ -1,11 +1,14 @@
+# get all currencies ever create
 GET http://127.0.0.1:8080/currencies
 
 ###
 
+# get a particular currency
 GET http://127.0.0.1:8080/currency/RUB
 
 ###
 
+# create a currency
 POST http://127.0.0.1:8080/currency
 Content-Type: application/json
 
@@ -16,6 +19,7 @@ Content-Type: application/json
 
 ###
 
+# update exchange rate of a currency
 PUT http://127.0.0.1:8080/currency
 Content-Type: application/json
 
@@ -26,6 +30,7 @@ Content-Type: application/json
 
 ###
 
-DELETE http://127.0.0.1:8080/currency/RUB
+# delete a currency. Not supported.
+#DELETE http://127.0.0.1:8080/currency/RUB
 
 ###
