@@ -41,3 +41,15 @@ to implement fast and thread-safe requests handlers.
 To start the server in `http://127.0.0.1:8080` run `./gradlew run`. \
 To build fat jar run `./gradlew jar`,  \
 `java -jar build/libs/TransferServer-1.0-SNAPSHOT.jar` to run the jar file.
+
+### Space for improvements
+
+* Money type shouldn't be `Double`
+* deposit and withdraw operations are not stored in transfers history, account to account transfers are only stored
+* limit number of accounts a single user can have
+* better parameters validation, e.g. user full name can contain any character, even number or asterisk.
+* multi-thread stress tests
+* Change `IDType` to be `UUID`
+* refactoring
+* expand API and entities
+* authorization and roles
