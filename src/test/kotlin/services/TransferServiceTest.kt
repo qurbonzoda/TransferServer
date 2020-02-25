@@ -1,9 +1,9 @@
 package services
 
-import BadRequest
-import IDType
-import IdNotFoundException
-import entities.Transfer
+import errors.BadRequest
+import types.IDType
+import errors.IdNotFoundException
+import entities.TransferDTO
 import entities.TransferStatus
 import org.junit.Test
 import kotlin.math.absoluteValue
@@ -14,6 +14,23 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 final class TransferServiceTest {
+
+    private fun initialize(currencyService: CurrencyService, accountService: AccountService): Set<IDType> {
+        currencyService.createCurrency("RUB", 64.07)
+        currencyService.createCurrency("USD", 1.0)
+        currencyService.createCurrency("EUR", 0.92)
+        val accountId1 = accountService.createAccount("RUB").id
+        val accountId2 = accountService.createAccount("RUB").id
+        val accountId3 = accountService.createAccount("USD").id
+        val accountId4 = accountService.createAccount("EUR").id
+
+        val accountIds = setOf(accountId1, accountId2, accountId3, accountId4)
+
+        accountIds.random().let { accountService.depositIntoAccount(it, 5000.0, "RUB") }
+
+        return accountIds
+    }
+
     @Test
     fun getTransfer() {
         val currencyService = CurrencyService()
@@ -22,19 +39,25 @@ final class TransferServiceTest {
 
         assertFailsWith<IdNotFoundException> { transferService.getTransfer(0) }
 
-        val accountId1 = accountService.createAccount("RUB").id
-        val accountId2 = accountService.createAccount("RUB").id
-        val accountId3 = accountService.createAccount("USD").id
-        val accountId4 = accountService.createAccount("EUR").id
-
-        val accountIds = setOf(accountId1, accountId2, accountId3, accountId4)
+        val accountIds = initialize(currencyService, accountService)
 
         val ids = mutableSetOf<IDType>()
+        val statuses = mutableListOf<TransferStatus>()
 
         repeat(100) { index ->
             val fromAccountId = accountIds.elementAt(index % accountIds.size)
             val toAccountId = accountIds.elementAt((index + 1) % accountIds.size)
             val amount = index.toDouble()
+
+            val rub = currencyService.getCurrency("RUB")
+            val fromAccount = accountService.getAccount(fromAccountId)
+            val fromCurrency = currencyService.getCurrency(fromAccount.currencyName)
+
+            if (rub.convert(amount, fromCurrency) <= fromAccount.balance) {
+                statuses.add(TransferStatus.SUCCEEDED)
+            } else {
+                statuses.add(TransferStatus.FAILED)
+            }
 
             val transfer = transferService.createTransfer(fromAccountId, toAccountId, amount, "RUB")
             ids.add(transfer.id)
@@ -53,7 +76,7 @@ final class TransferServiceTest {
             assertEquals(amount, transfer.amount)
             assertEquals("RUB", transfer.currencyName)
             assertTrue(System.currentTimeMillis() >= transfer.timestamp)
-            assertEquals(TransferStatus.SUCCEEDED, transfer.status)
+            assertEquals(statuses[index], transfer.status)
         }
     }
 
@@ -63,14 +86,11 @@ final class TransferServiceTest {
         val accountService = AccountService(currencyService)
         val transferService = TransferService(accountService, currencyService)
 
-        assertEquals(TransferStatus.FAILED, transferService.createTransfer(0, 1, 10.0, "RUB").status)
+        assertFailsWith<IdNotFoundException> {
+            transferService.createTransfer(0, 1, 10.0, "RUB")
+        }
 
-        val accountId1 = accountService.createAccount("RUB").id
-        val accountId2 = accountService.createAccount("RUB").id
-        val accountId3 = accountService.createAccount("USD").id
-        val accountId4 = accountService.createAccount("EUR").id
-
-        val accountIds = setOf(accountId1, accountId2, accountId3, accountId4)
+        val accountIds = initialize(currencyService, accountService)
 
         val ids = mutableSetOf<IDType>()
 
@@ -81,8 +101,17 @@ final class TransferServiceTest {
 
             assertFailsWith<BadRequest> { transferService.createTransfer(fromAccountId, fromAccountId, amount, "RUB") }
 
-            val fromAccountBalance = accountService.getAccount(fromAccountId).balance
-            val toAccountBalance = accountService.getAccount(toAccountId).balance
+            val rub = currencyService.getCurrency("RUB")
+            val fromAccount = accountService.getAccount(fromAccountId)
+            val fromCurrency = currencyService.getCurrency(fromAccount.currencyName)
+            val toAccount = accountService.getAccount(toAccountId)
+            val toCurrency = currencyService.getCurrency(toAccount.currencyName)
+
+            val status = if (rub.convert(amount, fromCurrency) <= fromAccount.balance) {
+                TransferStatus.SUCCEEDED
+            } else {
+                TransferStatus.FAILED
+            }
 
             val transfer = transferService.createTransfer(fromAccountId, toAccountId, amount, "RUB")
             assertEquals(fromAccountId, transfer.fromAccountId)
@@ -90,16 +119,20 @@ final class TransferServiceTest {
             assertEquals(amount, transfer.amount)
             assertEquals("RUB", transfer.currencyName)
             assertTrue(System.currentTimeMillis() >= transfer.timestamp)
-            assertEquals(TransferStatus.SUCCEEDED, transfer.status)
+            assertEquals(status, transfer.status)
 
             val  eps = 1E-6
-            accountService.getAccount(fromAccountId).balance.let { actual ->
-                val expected = (fromAccountBalance - amount)
-                assertTrue((expected - actual).absoluteValue < eps, "amount: $amount, expected: $expected, actual: $actual")
-            }
-            accountService.getAccount(toAccountId).balance.let { actual ->
-                val expected = (toAccountBalance + amount)
-                assertTrue((expected - actual).absoluteValue < eps, "amount: $amount, expected: $expected, actual: $actual")
+            val fromActual = accountService.getAccount(fromAccountId).balance
+            val toActual = accountService.getAccount(toAccountId).balance
+
+            if (status == TransferStatus.FAILED) {
+                assertEquals(fromAccount.balance, fromActual)
+                assertEquals(toAccount.balance, toActual)
+            } else {
+                val fromExpected = fromAccount.balance - rub.convert(amount, fromCurrency)
+                val toExpected = toAccount.balance + rub.convert(amount, toCurrency)
+                assertTrue((fromExpected - fromActual).absoluteValue < eps)
+                assertTrue((toExpected - toActual).absoluteValue < eps)
             }
 
             assertTrue(ids.add(transfer.id))
@@ -112,12 +145,7 @@ final class TransferServiceTest {
         val accountService = AccountService(currencyService)
         val transferService = TransferService(accountService, currencyService)
 
-        val accountId1 = accountService.createAccount("RUB").id
-        val accountId2 = accountService.createAccount("RUB").id
-        val accountId3 = accountService.createAccount("USD").id
-        val accountId4 = accountService.createAccount("EUR").id
-
-        val accountIds = setOf(accountId1, accountId2, accountId3, accountId4)
+        val accountIds = initialize(currencyService, accountService)
 
         accountIds.forEach {
             assertTrue(transferService.getTransfers(it, 0, 10).isEmpty())
@@ -130,22 +158,22 @@ final class TransferServiceTest {
             val toAccountId = (accountIds - fromAccountId).random()
             val amount = Random.nextInt(256).toDouble()
 
-            val transferId = transferService.createTransfer(fromAccountId, toAccountId, amount, "RUB").id
+            val transfer = transferService.createTransfer(fromAccountId, toAccountId, amount, "RUB")
 
             val fromAccountTransfers = accountIdToTransferIds.getOrPut(fromAccountId, { mutableSetOf() })
-            fromAccountTransfers.add(transferId)
+            fromAccountTransfers.add(transfer.id)
 
             val toAccountTransfers = accountIdToTransferIds.getOrPut(toAccountId, { mutableSetOf() })
-            toAccountTransfers.add(transferId)
+            toAccountTransfers.add(transfer.id)
         }
 
-        accountIds.forEach {
-            val expected = accountIdToTransferIds[it]!!
+        accountIds.forEach { accountId ->
+            val expected = accountIdToTransferIds[accountId]!!
             val offset = Random.nextInt(0..expected.size)
             val limit = Random.nextInt(0..expected.size)
 
-            val actual = transferService.getTransfers(it, offset, limit).map(Transfer::id).toSet()
-            assertEquals(expected.drop(offset).take(limit).toSet(), actual)
+            val actual = transferService.getTransfers(accountId, offset, limit).map(TransferDTO::id)
+            assertEquals(expected.drop(offset).take(limit), actual)
         }
     }
 }

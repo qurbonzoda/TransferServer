@@ -1,6 +1,6 @@
 package controllers
 
-import ExchangeRateType
+import types.ExchangeRateType
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
@@ -34,11 +34,11 @@ fun Routing.apiCurrency(service: CurrencyService) {
             call.respond(HttpStatusCode.OK)
         }
 
-        delete("{name}") {
-            val name = call.parameters["name"]!!
-            service.deleteCurrency(name)
-            call.respond(HttpStatusCode.OK)
-        }
+//        delete("{name}") {
+//            val name = call.parameters["name"]!!
+//            service.deleteCurrency(name)
+//            call.respond(HttpStatusCode.OK)
+//        }
     }
 }
 

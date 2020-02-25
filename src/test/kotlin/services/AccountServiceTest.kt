@@ -1,29 +1,29 @@
 package services
 
-import BadRequest
-import DeleteNotAllowedException
-import IDType
-import IdNotFoundException
+import errors.BadRequest
+import errors.DeleteNotAllowedException
+import errors.IdNotFoundException
+import types.IDType
 import org.junit.Test
+import types.ZeroMoney
+import kotlin.math.absoluteValue
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class AccountServiceTest {
-    private fun createAccountService(): AccountService {
-        val currencyService = CurrencyService()
-        return AccountService(currencyService)
-    }
-
     @Test
     fun createAccount() {
-        val accountService = createAccountService()
+        val currencyService = CurrencyService()
+        val accountService = AccountService(currencyService)
+
+        currencyService.createCurrency("RUB", 64.07)
 
         val ids = mutableSetOf<IDType>()
 
         repeat(100) {
             val account = accountService.createAccount("RUB")
-            assertEquals(0.0, account.balance)
+            assertEquals(ZeroMoney, account.balance)
             assertEquals("RUB", account.currencyName)
 
             assertTrue(ids.add(account.id))
@@ -32,9 +32,12 @@ class AccountServiceTest {
 
     @Test
     fun getAccount() {
-        val accountService = createAccountService()
+        val currencyService = CurrencyService()
+        val accountService = AccountService(currencyService)
 
         assertFailsWith<BadRequest> { accountService.getAccount(0) }
+
+        currencyService.createCurrency("RUB", 64.07)
 
         val ids = mutableSetOf<IDType>()
 
@@ -47,17 +50,22 @@ class AccountServiceTest {
             val accountId = ids.elementAt(index)
             val account = accountService.getAccount(accountId)
             assertEquals(accountId, account.id)
-            assertEquals(0.0, account.balance)
+            assertEquals(ZeroMoney, account.balance)
             assertEquals("RUB", account.currencyName)
         }
     }
 
     @Test
     fun depositIntoAccount() {
-        val accountService = createAccountService()
+        val currencyService = CurrencyService()
+        val accountService = AccountService(currencyService)
+
 
         assertFailsWith<IdNotFoundException> { accountService.depositIntoAccount(0, 10.0, "RUB") }
         assertFailsWith<IllegalArgumentException> { accountService.depositIntoAccount(0, -10.0, "RUB") }
+
+        currencyService.createCurrency("RUB", 64.07)
+        currencyService.createCurrency("USD", 1.0)
 
         val ids = mutableSetOf<IDType>()
 
@@ -72,25 +80,31 @@ class AccountServiceTest {
             assertFailsWith<IllegalArgumentException> { accountService.depositIntoAccount(accountId, -10.0, "RUB") }
             accountService.depositIntoAccount(accountId, 10.0, "USD")
 
+            val eps = 1E-6
             val account = accountService.getAccount(accountId)
             assertEquals(accountId, account.id)
-            assertEquals(20.0, account.balance)
+            assertTrue((650.7 - account.balance).absoluteValue < eps)
             assertEquals("RUB", account.currencyName)
         }
     }
 
     @Test
     fun withdrawFromAccount() {
-        val accountService = createAccountService()
+        val currencyService = CurrencyService()
+        val accountService = AccountService(currencyService)
 
         assertFailsWith<IdNotFoundException> { accountService.withdrawFromAccount(0, 10.0, "RUB") }
         assertFailsWith<IllegalArgumentException> { accountService.withdrawFromAccount(0, -10.0, "RUB") }
+
+        currencyService.createCurrency("RUB", 64.07)
+        currencyService.createCurrency("USD", 1.0)
 
         val ids = mutableSetOf<IDType>()
 
         repeat(100) {
             val accountId = accountService.createAccount("RUB").id
             ids.add(accountId)
+            accountService.depositIntoAccount(accountId, 5000.0, "RUB")
         }
 
         repeat(100) { index ->
@@ -99,18 +113,22 @@ class AccountServiceTest {
             assertFailsWith<IllegalArgumentException> { accountService.withdrawFromAccount(accountId, -10.0, "RUB") }
             accountService.withdrawFromAccount(accountId, 10.0, "USD")
 
+            val eps = 1E-6
             val account = accountService.getAccount(accountId)
             assertEquals(accountId, account.id)
-            assertEquals(-20.0, account.balance)
+            assertTrue((4990.0 - 640.7 - account.balance).absoluteValue < eps)
             assertEquals("RUB", account.currencyName)
         }
     }
 
     @Test
     fun deleteAccount() {
-        val accountService = createAccountService()
+        val currencyService = CurrencyService()
+        val accountService = AccountService(currencyService)
 
         assertFailsWith<BadRequest> { accountService.deleteAccount(0) }
+
+        currencyService.createCurrency("RUB", 64.07)
 
         val ids = mutableSetOf<IDType>()
 

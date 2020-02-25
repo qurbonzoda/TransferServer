@@ -1,9 +1,11 @@
 package services
 
-import BadRequest
-import DeleteNotAllowedException
-import IDType
+import errors.BadRequest
+import errors.DeleteNotAllowedException
+import errors.IdNotFoundException
+import types.IDType
 import org.junit.Test
+import types.ZeroMoney
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
@@ -81,7 +83,11 @@ class UserServiceTest {
 
     @Test
     fun deleteUser() {
-        val userService = createUserService()
+        val currencyService = CurrencyService()
+        val accountService = AccountService(currencyService)
+        val userService = UserService(accountService)
+
+        currencyService.createCurrency("RUB", 64.07)
 
         assertFailsWith<BadRequest> { userService.deleteUser(0) }
 
@@ -109,10 +115,13 @@ class UserServiceTest {
 
     @Test
     fun createAccount() {
-        val accountService = createAccountService()
+        val currencyService = CurrencyService()
+        val accountService = AccountService(currencyService)
         val userService = UserService(accountService)
 
-        assertFailsWith<BadRequest> { userService.createAccount(0, "RUB") }
+        currencyService.createCurrency("RUB", 64.07)
+
+        assertFailsWith<IdNotFoundException> { userService.createAccount(0, "RUB") }
 
         val userId = userService.createUser("Abduqodiri Qurbonzoda").id
 
@@ -121,7 +130,7 @@ class UserServiceTest {
         repeat(100) {
             val account = userService.createAccount(userId, "RUB")
             assertEquals("RUB", account.currencyName)
-            assertEquals(0.0, account.balance)
+            assertEquals(ZeroMoney, account.balance)
 
             assertTrue(ids.add(account.id))
 
@@ -133,8 +142,11 @@ class UserServiceTest {
 
     @Test
     fun deleteAccount() {
-        val accountService = createAccountService()
+        val currencyService = CurrencyService()
+        val accountService = AccountService(currencyService)
         val userService = UserService(accountService)
+
+        currencyService.createCurrency("RUB", 64.07)
 
         assertFailsWith<BadRequest> { userService.deleteAccount(0, 0) }
 

@@ -1,8 +1,8 @@
 package controllers
 
-import BadRequest
-import IDType
-import MoneyType
+import errors.BadRequest
+import types.IDType
+import types.MoneyType
 import io.ktor.application.call
 import io.ktor.request.receive
 import io.ktor.response.respond

@@ -1,7 +1,7 @@
 package controllers
 
-import BadRequest
-import IDType
+import errors.BadRequest
+import types.IDType
 import io.ktor.application.ApplicationCall
 
 fun ApplicationCall.validateId(name: String): IDType {

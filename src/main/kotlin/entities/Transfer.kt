@@ -1,11 +1,10 @@
 package entities
 
-import IDType
-import MoneyType
+import types.IDType
+import types.MoneyType
 import kotlinx.serialization.Serializable
 
-@Serializable
-final class Transfer(
+class Transfer(
     val id: IDType,
     val fromAccountId: IDType,
     val toAccountId: IDType,
@@ -14,19 +13,25 @@ final class Transfer(
     val timestamp: Long,
     val status: TransferStatus
 ) {
-    fun updateStatus(updatedStatus: TransferStatus): Transfer {
-        return Transfer(
-            id,
-            fromAccountId,
-            toAccountId,
-            amount,
-            currencyName,
-            timestamp,
-            updatedStatus
-        )
+    fun toDTO(): TransferDTO {
+        return TransferDTO(id, fromAccountId, toAccountId, amount, currencyName, timestamp, status)
     }
 }
 
+
+@Serializable
+data class TransferDTO(
+    val id: IDType,
+    val fromAccountId: IDType,
+    val toAccountId: IDType,
+    val amount: MoneyType,
+    val currencyName: String,
+    val timestamp: Long,
+    val status: TransferStatus
+)
+
+@Serializable
 enum class TransferStatus {
-    PROCESSING, SUCCEEDED, FAILED
+    SUCCEEDED, FAILED
 }
+

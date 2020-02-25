@@ -1,7 +1,5 @@
-import controllers.apiAccount
-import controllers.apiCurrency
-import controllers.apiTransfer
-import controllers.apiUser
+import controllers.*
+import errors.BadRequest
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CallLogging
@@ -13,10 +11,7 @@ import io.ktor.routing.*
 import io.ktor.serialization.serialization
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import services.AccountService
-import services.CurrencyService
-import services.TransferService
-import services.UserService
+import services.*
 
 fun main(args: Array<String>) {
     embeddedServer(Netty, port = 8080) {
